@@ -10,15 +10,29 @@
   "license": "MIT",
   "repository": "araujogui/ucastle",
   "author": "Guilherme Araújo <arauujogui@gmail.com>",
+  "type": "module",
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "default": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "format": "prettier --write .",
-    "lint": "eslint ."
+    "build": "tsc",
+    "lint": "eslint .",
+    "format": "prettier --write ."
   },
   "devDependencies": {
     "@eslint/js": "^9.16.0",
+    "@types/node": "^22.10.2",
     "eslint": "^9.16.0",
     "globals": "^15.13.0",
     "prettier": "3.4.2",
+    "typescript": "^5.7.2",
     "typescript-eslint": "^8.18.0"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }
