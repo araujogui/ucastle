@@ -1,0 +1,13 @@
+{
+  "name": "ucastle",
+  "version": "0.1.0",
+  "description": "Convert CASL rules into Drizzle filters",
+  "keywords": [
+    "drizzle",
+    "casl",
+    "ucast"
+  ],
+  "license": "MIT",
+  "repository": "araujogui/ucastle",
+  "author": "Guilherme Araújo <arauujogui@gmail.com>"
+}
