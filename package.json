@@ -9,5 +9,11 @@
   ],
   "license": "MIT",
   "repository": "araujogui/ucastle",
-  "author": "Guilherme Araújo <arauujogui@gmail.com>"
+  "author": "Guilherme Araújo <arauujogui@gmail.com>",
+  "scripts": {
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "prettier": "3.4.2"
+  }
 }
