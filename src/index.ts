@@ -1,4 +1,4 @@
-import { PureAbility } from "@casl/ability";
+import { AnyAbility, ExtractSubjectType } from "@casl/ability";
 import { rulesToAST } from "@casl/ability/extra";
 import { CompoundCondition, Condition, FieldCondition } from "@ucast/core";
 import * as drizzle from "drizzle-orm";
@@ -90,11 +90,16 @@ export function generateSQL<T extends drizzle.TableConfig>(
   return op(condition as any, table);
 }
 
-export function rulesToDrizzle<T extends drizzle.TableConfig>(
-  ability: PureAbility,
+export function rulesToDrizzle<
+  T extends drizzle.TableConfig,
+  U extends AnyAbility,
+>(
+  ability: AnyAbility,
+  action: Parameters<U["rulesFor"]>[0],
+  subject: ExtractSubjectType<Parameters<U["rulesFor"]>[1]>,
   table: TableWithColumns<T>,
 ): drizzle.SQL | undefined {
-  const condition = rulesToAST(ability, "read", "User");
+  const condition = rulesToAST(ability, action, subject);
 
   if (!condition) {
     return undefined;

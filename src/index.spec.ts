@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { generateSQL } from "./index.js";
+import { generateSQL, rulesToDrizzle } from "./index.js";
 import { integer, pgTable, text } from "drizzle-orm/pg-core";
 import { and, eq, gt, gte, lt, lte, or } from "drizzle-orm";
 import { CompoundCondition, FieldCondition } from "@ucast/core";
+import { defineAbility } from "@casl/ability";
 
 const users = pgTable("users", {
   id: integer().primaryKey(),
@@ -94,5 +95,17 @@ describe("generateSQL", () => {
     expect(() => {
       generateSQL(condition, users);
     }).toThrowError("Unsupported operator: in");
+  });
+});
+
+describe("generateSQL", () => {
+  it("should convert casl rules into drizzle filters", () => {
+    const ability = defineAbility((can) => {
+      can("read", "User", { id: 1 });
+    });
+
+    const sql = rulesToDrizzle(ability, "User", "read", users);
+
+    expect(sql).toEqual(eq(users.id, 1));
   });
 });
