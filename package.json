@@ -23,6 +23,11 @@
     "lint": "eslint .",
     "format": "prettier --write ."
   },
+  "dependencies": {
+    "@casl/ability": "^6.7.2",
+    "@ucast/core": "^1.10.2",
+    "drizzle-orm": "^0.38.1"
+  },
   "devDependencies": {
     "@eslint/js": "^9.16.0",
     "@types/node": "^22.10.2",
@@ -31,6 +36,11 @@
     "prettier": "3.4.2",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.18.0"
+  },
+  "peerDependencies": {
+    "@casl/ability": "^6.0.0",
+    "@ucast/core": "^1.0.0",
+    "drizzle-orm": "^0.38.0"
   },
   "engines": {
     "node": ">=22"
