@@ -1,23 +1,16 @@
 import { PureAbility } from "@casl/ability";
 import { rulesToAST } from "@casl/ability/extra";
 import { FieldCondition } from "@ucast/core";
-import { eq, gt, SQL } from "drizzle-orm";
+import { Column, eq, gt, SQL } from "drizzle-orm";
 import { type PgTableWithColumns, type TableConfig } from "drizzle-orm/pg-core";
 
-type Operator = (
-  condition: FieldCondition,
-  table: PgTableWithColumns<TableConfig>,
-) => SQL | undefined;
+type Operator = (condition: FieldCondition, column: Column) => SQL | undefined;
 
 const operators: Record<string, Operator> = {
-  eq: (condition, table) => {
-    const column = table[condition.field];
-
+  eq: (condition, column) => {
     return eq(column, condition.value);
   },
-  gt: (condition, table) => {
-    const column = table[condition.field];
-
+  gt: (condition, column) => {
     return gt(column, condition.value);
   },
 };
@@ -40,5 +33,7 @@ export function rulesToDrizzle<T extends TableConfig>(
     throw new Error(`Unsupported operator: ${operator}`);
   }
 
-  return op(condition, table);
+  const column = table[condition.field];
+
+  return op(condition, column);
 }
