@@ -1,41 +1,58 @@
-import { defineAbility } from "@casl/ability";
 import { describe, expect, it } from "vitest";
-import { rulesToDrizzle } from "./index.js";
-import { integer, pgTable } from "drizzle-orm/pg-core";
-import { eq, gt } from "drizzle-orm";
+import { generateSQL } from "./index.js";
+import { integer, pgTable, text } from "drizzle-orm/pg-core";
+import { and, eq, gt, or } from "drizzle-orm";
+import { CompoundCondition, FieldCondition } from "@ucast/core";
 
 const users = pgTable("users", {
   id: integer().primaryKey(),
+  name: text(),
 });
 
-describe("rulesToDrizzle", () => {
+describe("generateSQL", () => {
   it("should generate an eq filter if condition operator is eq", () => {
-    const ability = defineAbility((can) => {
-      can("read", "User", { id: 1 });
-    });
+    const condition = new FieldCondition("eq", "id", 1);
 
-    const where = rulesToDrizzle(ability, users);
+    const sql = generateSQL(condition, users);
 
-    expect(where).toEqual(eq(users.id, 1));
+    expect(sql).toEqual(eq(users.id, 1));
   });
 
   it("should generate an gt filter if condition operator is gt", () => {
-    const ability = defineAbility((can) => {
-      can("read", "User", { id: { $gt: 1 } });
-    });
+    const condition = new FieldCondition("gt", "id", 1);
 
-    const where = rulesToDrizzle(ability, users);
+    const sql = generateSQL(condition, users);
 
-    expect(where).toEqual(gt(users.id, 1));
+    expect(sql).toEqual(gt(users.id, 1));
+  });
+
+  it("should generate an and filter if condition operator is and", () => {
+    const condition = new CompoundCondition("and", [
+      new FieldCondition("eq", "id", 1),
+      new FieldCondition("eq", "name", "John"),
+    ]);
+
+    const sql = generateSQL(condition, users);
+
+    expect(sql).toEqual(and(eq(users.id, 1), eq(users.name, "John")));
+  });
+
+  it("should generate a or filter if condition operator is or", () => {
+    const condition = new CompoundCondition("or", [
+      new FieldCondition("eq", "id", 1),
+      new FieldCondition("eq", "name", "John"),
+    ]);
+
+    const sql = generateSQL(condition, users);
+
+    expect(sql).toEqual(or(eq(users.id, 1), eq(users.name, "John")));
   });
 
   it("should throw an error if condition operator is not supported", () => {
-    const ability = defineAbility((can) => {
-      can("read", "User", { id: { $in: [1, 2] } });
-    });
+    const condition = new FieldCondition("in", "id", [1, 2]);
 
     expect(() => {
-      rulesToDrizzle(ability, users);
+      generateSQL(condition, users);
     }).toThrowError("Unsupported operator: in");
   });
 });
