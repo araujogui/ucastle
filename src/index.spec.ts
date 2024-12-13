@@ -48,6 +48,22 @@ describe("generateSQL", () => {
     expect(sql).toEqual(or(eq(users.id, 1), eq(users.name, "John")));
   });
 
+  it("should generate nested compound filters", () => {
+    const condition = new CompoundCondition("or", [
+      new FieldCondition("eq", "name", "John"),
+      new CompoundCondition("and", [
+        new FieldCondition("eq", "id", 1),
+        new FieldCondition("eq", "name", "Jane"),
+      ]),
+    ]);
+
+    const sql = generateSQL(condition, users);
+
+    expect(sql).toEqual(
+      or(eq(users.name, "John"), and(eq(users.id, 1), eq(users.name, "Jane"))),
+    );
+  });
+
   it("should throw an error if condition operator is not supported", () => {
     const condition = new FieldCondition("in", "id", [1, 2]);
 
