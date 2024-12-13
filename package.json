@@ -20,6 +20,8 @@
   ],
   "scripts": {
     "build": "tsc",
+    "test": "vitest",
+    "test:w": "vitest --watch",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
@@ -35,7 +37,8 @@
     "globals": "^15.13.0",
     "prettier": "3.4.2",
     "typescript": "^5.7.2",
-    "typescript-eslint": "^8.18.0"
+    "typescript-eslint": "^8.18.0",
+    "vitest": "^2.1.8"
   },
   "peerDependencies": {
     "@casl/ability": "^6.0.0",
