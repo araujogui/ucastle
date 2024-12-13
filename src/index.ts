@@ -31,6 +31,24 @@ const gt: FieldOperator = (condition, table) => {
   return drizzle.gt(column, condition.value);
 };
 
+const gte: FieldOperator = (condition, table) => {
+  const column = table[condition.field];
+
+  return drizzle.gte(column, condition.value);
+};
+
+const lt: FieldOperator = (condition, table) => {
+  const column = table[condition.field];
+
+  return drizzle.lt(column, condition.value);
+};
+
+const lte: FieldOperator = (condition, table) => {
+  const column = table[condition.field];
+
+  return drizzle.lte(column, condition.value);
+};
+
 const and: CompoundOperator = (conditions, table) => {
   return drizzle.and(
     ...conditions.value.map((condition) => {
@@ -50,6 +68,9 @@ const or: CompoundOperator = (conditions, table) => {
 const operators: Record<string, FieldOperator | CompoundOperator> = {
   eq,
   gt,
+  gte,
+  lt,
+  lte,
   and,
   or,
 };

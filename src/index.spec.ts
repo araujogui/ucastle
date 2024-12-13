@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { generateSQL } from "./index.js";
 import { integer, pgTable, text } from "drizzle-orm/pg-core";
-import { and, eq, gt, or } from "drizzle-orm";
+import { and, eq, gt, gte, lt, lte, or } from "drizzle-orm";
 import { CompoundCondition, FieldCondition } from "@ucast/core";
 
 const users = pgTable("users", {
@@ -24,6 +24,30 @@ describe("generateSQL", () => {
     const sql = generateSQL(condition, users);
 
     expect(sql).toEqual(gt(users.id, 1));
+  });
+
+  it("should generate an gte filter if condition operator is gte", () => {
+    const condition = new FieldCondition("gte", "id", 1);
+
+    const sql = generateSQL(condition, users);
+
+    expect(sql).toEqual(gte(users.id, 1));
+  });
+
+  it("should generate an lt filter if condition operator is lt", () => {
+    const condition = new FieldCondition("lt", "id", 1);
+
+    const sql = generateSQL(condition, users);
+
+    expect(sql).toEqual(lt(users.id, 1));
+  });
+
+  it("should generate an lte filter if condition operator is lte", () => {
+    const condition = new FieldCondition("lte", "id", 1);
+
+    const sql = generateSQL(condition, users);
+
+    expect(sql).toEqual(lte(users.id, 1));
   });
 
   it("should generate an and filter if condition operator is and", () => {
