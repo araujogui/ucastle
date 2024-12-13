@@ -2,16 +2,21 @@ import { PureAbility } from "@casl/ability";
 import { rulesToAST } from "@casl/ability/extra";
 import { CompoundCondition, Condition, FieldCondition } from "@ucast/core";
 import * as drizzle from "drizzle-orm";
-import { type PgTableWithColumns, type TableConfig } from "drizzle-orm/pg-core";
+
+export type TableWithColumns<
+  T extends drizzle.TableConfig = drizzle.TableConfig,
+> = drizzle.Table<T> & {
+  [Key in keyof T["columns"]]: T["columns"][Key];
+};
 
 type FieldOperator = (
   condition: FieldCondition,
-  table: PgTableWithColumns<TableConfig>,
+  table: TableWithColumns,
 ) => drizzle.SQL | undefined;
 
 type CompoundOperator = (
   conditions: CompoundCondition,
-  table: PgTableWithColumns<TableConfig>,
+  table: TableWithColumns,
 ) => drizzle.SQL | undefined;
 
 const eq: FieldOperator = (condition, table) => {
@@ -49,9 +54,9 @@ const operators: Record<string, FieldOperator | CompoundOperator> = {
   or,
 };
 
-export function generateSQL<T extends TableConfig>(
+export function generateSQL<T extends drizzle.TableConfig>(
   condition: Condition,
-  table: PgTableWithColumns<T>,
+  table: TableWithColumns<T>,
 ): drizzle.SQL | undefined {
   const { operator } = condition;
 
@@ -64,9 +69,9 @@ export function generateSQL<T extends TableConfig>(
   return op(condition as any, table);
 }
 
-export function rulesToDrizzle<T extends TableConfig>(
+export function rulesToDrizzle<T extends drizzle.TableConfig>(
   ability: PureAbility,
-  table: PgTableWithColumns<T>,
+  table: TableWithColumns<T>,
 ): drizzle.SQL | undefined {
   const condition = rulesToAST(ability, "read", "User");
 
