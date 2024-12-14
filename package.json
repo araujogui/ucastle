@@ -1,6 +1,6 @@
 {
   "name": "ucastle",
-  "version": "1.2.1",
+  "version": "1.2.3",
   "description": "Convert CASL rules into Drizzle filters",
   "keywords": [
     "drizzle",

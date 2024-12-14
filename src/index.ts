@@ -1,4 +1,4 @@
-import { AnyAbility, ExtractSubjectType } from "@casl/ability";
+import { AnyMongoAbility, ExtractSubjectType } from "@casl/ability";
 import { rulesToAST } from "@casl/ability/extra";
 import { CompoundCondition, Condition, FieldCondition } from "@ucast/core";
 import * as drizzle from "drizzle-orm";
@@ -92,9 +92,9 @@ export function generateSQL<T extends drizzle.TableConfig>(
 
 export function rulesToDrizzle<
   T extends drizzle.TableConfig,
-  U extends AnyAbility,
+  U extends AnyMongoAbility,
 >(
-  ability: AnyAbility,
+  ability: U,
   action: Parameters<U["rulesFor"]>[0],
   subject: ExtractSubjectType<Parameters<U["rulesFor"]>[1]>,
   table: TableWithColumns<T>,
