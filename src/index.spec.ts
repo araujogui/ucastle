@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { generateSQL, rulesToDrizzle } from "./index.js";
 import { integer, pgTable, text } from "drizzle-orm/pg-core";
-import { and, eq, gt, gte, lt, lte, or } from "drizzle-orm";
+import { and, eq, gt, gte, lt, lte, ne, or } from "drizzle-orm";
 import { CompoundCondition, FieldCondition } from "@ucast/core";
 import { defineAbility } from "@casl/ability";
 
@@ -17,6 +17,14 @@ describe("generateSQL", () => {
     const sql = generateSQL(condition, users);
 
     expect(sql).toEqual(eq(users.id, 1));
+  });
+
+  it("should generate an ne filter if condition operator is ne", () => {
+    const condition = new FieldCondition("ne", "id", 1);
+
+    const sql = generateSQL(condition, users);
+
+    expect(sql).toEqual(ne(users.id, 1));
   });
 
   it("should generate an gt filter if condition operator is gt", () => {
@@ -104,7 +112,7 @@ describe("generateSQL", () => {
       can("read", "User", { id: 1 });
     });
 
-    const sql = rulesToDrizzle(ability, "User", "read", users);
+    const sql = rulesToDrizzle(ability, "read", "User", users);
 
     expect(sql).toEqual(eq(users.id, 1));
   });

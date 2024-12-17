@@ -25,6 +25,12 @@ const eq: FieldOperator = (condition, table) => {
   return drizzle.eq(column, condition.value);
 };
 
+const ne: FieldOperator = (condition, table) => {
+  const column = table[condition.field];
+
+  return drizzle.ne(column, condition.value);
+};
+
 const gt: FieldOperator = (condition, table) => {
   const column = table[condition.field];
 
@@ -67,6 +73,7 @@ const or: CompoundOperator = (conditions, table) => {
 
 const operators: Record<string, FieldOperator | CompoundOperator> = {
   eq,
+  ne,
   gt,
   gte,
   lt,
