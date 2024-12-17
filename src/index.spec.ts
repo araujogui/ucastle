@@ -8,6 +8,7 @@ import { defineAbility } from "@casl/ability";
 const users = pgTable("users", {
   id: integer().primaryKey(),
   name: text(),
+  age: integer(),
 });
 
 describe("generateSQL", () => {
@@ -109,11 +110,14 @@ describe("generateSQL", () => {
 describe("generateSQL", () => {
   it("should convert casl rules into drizzle filters", () => {
     const ability = defineAbility((can) => {
-      can("read", "User", { id: 1 });
+      can("read", "User", { id: 1, age: { $lt: 18 } });
+      can("read", "User", { age: { $gte: 18 } });
     });
 
     const sql = rulesToDrizzle(ability, "read", "User", users);
 
-    expect(sql).toEqual(eq(users.id, 1));
+    expect(sql).toEqual(
+      or(gte(users.age, 18), and(eq(users.id, 1), lt(users.age, 18))),
+    );
   });
 });
