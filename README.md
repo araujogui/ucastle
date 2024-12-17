@@ -25,6 +25,6 @@ const ability = defineAbility((can) => {
 });
 
 // Convert MongoDB query conditions into Drizzle filters
-const where = rulesToDrizzle(ability, users);
+const where = rulesToDrizzle(ability, "read", "User", users);
 // eq(users.id, 1)
 ```
