@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { generateSQL, rulesToDrizzle } from "./index.js";
 import { integer, pgTable, text } from "drizzle-orm/pg-core";
-import { and, eq, gt, gte, lt, lte, ne, or } from "drizzle-orm";
+import { and, eq, gt, gte, lt, lte, ne, or, inArray, notInArray } from "drizzle-orm";
 import { CompoundCondition, FieldCondition } from "@ucast/core";
 import { defineAbility } from "@casl/ability";
 
@@ -12,7 +12,7 @@ const users = pgTable("users", {
 });
 
 describe("generateSQL", () => {
-  it("should generate an eq filter if condition operator is eq", () => {
+  it("should generate an `eq` filter if condition operator is `eq`", () => {
     const condition = new FieldCondition("eq", "id", 1);
 
     const sql = generateSQL(condition, users);
@@ -20,7 +20,7 @@ describe("generateSQL", () => {
     expect(sql).toEqual(eq(users.id, 1));
   });
 
-  it("should generate an ne filter if condition operator is ne", () => {
+  it("should generate an `ne` filter if condition operator is `ne`", () => {
     const condition = new FieldCondition("ne", "id", 1);
 
     const sql = generateSQL(condition, users);
@@ -28,7 +28,7 @@ describe("generateSQL", () => {
     expect(sql).toEqual(ne(users.id, 1));
   });
 
-  it("should generate an gt filter if condition operator is gt", () => {
+  it("should generate an `gt` filter if condition operator is `gt`", () => {
     const condition = new FieldCondition("gt", "id", 1);
 
     const sql = generateSQL(condition, users);
@@ -36,7 +36,7 @@ describe("generateSQL", () => {
     expect(sql).toEqual(gt(users.id, 1));
   });
 
-  it("should generate an gte filter if condition operator is gte", () => {
+  it("should generate an `gte` filter if condition operator is `gte`", () => {
     const condition = new FieldCondition("gte", "id", 1);
 
     const sql = generateSQL(condition, users);
@@ -44,7 +44,7 @@ describe("generateSQL", () => {
     expect(sql).toEqual(gte(users.id, 1));
   });
 
-  it("should generate an lt filter if condition operator is lt", () => {
+  it("should generate an `lt` filter if condition operator is `lt`", () => {
     const condition = new FieldCondition("lt", "id", 1);
 
     const sql = generateSQL(condition, users);
@@ -52,7 +52,7 @@ describe("generateSQL", () => {
     expect(sql).toEqual(lt(users.id, 1));
   });
 
-  it("should generate an lte filter if condition operator is lte", () => {
+  it("should generate an `lte` filter if condition operator is `lte`", () => {
     const condition = new FieldCondition("lte", "id", 1);
 
     const sql = generateSQL(condition, users);
@@ -60,7 +60,7 @@ describe("generateSQL", () => {
     expect(sql).toEqual(lte(users.id, 1));
   });
 
-  it("should generate an and filter if condition operator is and", () => {
+  it("should generate an `and` filter if condition operator is `and`", () => {
     const condition = new CompoundCondition("and", [
       new FieldCondition("eq", "id", 1),
       new FieldCondition("eq", "name", "John"),
@@ -71,7 +71,7 @@ describe("generateSQL", () => {
     expect(sql).toEqual(and(eq(users.id, 1), eq(users.name, "John")));
   });
 
-  it("should generate a or filter if condition operator is or", () => {
+  it("should generate a `or` filter if condition operator is `or`", () => {
     const condition = new CompoundCondition("or", [
       new FieldCondition("eq", "id", 1),
       new FieldCondition("eq", "name", "John"),
@@ -99,11 +99,29 @@ describe("generateSQL", () => {
   });
 
   it("should throw an error if condition operator is not supported", () => {
-    const condition = new FieldCondition("in", "id", [1, 2]);
+    const condition = new FieldCondition("not", "id", [1, 2]);
 
     expect(() => {
       generateSQL(condition, users);
-    }).toThrowError("Unsupported operator: in");
+    }).toThrowError("Unsupported operator: not");
+  });
+
+
+  it("should generate an `inArray` filter if condition operator is `in`", () => {
+    const condition = new FieldCondition("in", "id", [1, 2]);
+
+    const sql = generateSQL(condition, users);
+
+    expect(sql).toEqual(inArray(users.id, [1, 2]));
+  });
+
+
+  it("should generate an `notInArray` filter if condition operator is `nin`", () => {
+    const condition = new FieldCondition("nin", "id", [1, 2]);
+
+    const sql = generateSQL(condition, users);
+
+    expect(sql).toEqual(notInArray(users.id, [1, 2]));
   });
 });
 

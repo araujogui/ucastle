@@ -55,6 +55,18 @@ const lte: FieldOperator = (condition, table) => {
   return drizzle.lte(column, condition.value);
 };
 
+// we can't use `in` as const, so we're using `inArray` as alias
+// inside the `operators` object we rename it to `in` to avoid confusion
+const inArray: FieldOperator = (condition, table) => {
+  const column = table[condition.field];
+  return drizzle.inArray(column, condition.value as unknown[]);
+};
+
+const notInArray: FieldOperator = (condition, table) => {
+  const column = table[condition.field];
+  return drizzle.notInArray(column, condition.value as unknown[]);
+};
+
 const and: CompoundOperator = (conditions, table) => {
   return drizzle.and(
     ...conditions.value.map((condition) => {
@@ -80,6 +92,8 @@ const operators: Record<string, FieldOperator | CompoundOperator> = {
   lte,
   and,
   or,
+  in: inArray,
+  nin: notInArray
 };
 
 export function generateSQL<T extends drizzle.TableConfig>(
@@ -94,6 +108,7 @@ export function generateSQL<T extends drizzle.TableConfig>(
     throw new Error(`Unsupported operator: ${operator}`);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return op(condition as any, table);
 }
 
