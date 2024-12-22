@@ -1,7 +1,19 @@
 import { describe, expect, it } from "vitest";
 import { generateSQL, rulesToDrizzle } from "./index.js";
 import { integer, pgTable, text } from "drizzle-orm/pg-core";
-import { and, eq, gt, gte, lt, lte, ne, or, inArray, notInArray } from "drizzle-orm";
+import {
+  and,
+  eq,
+  gt,
+  gte,
+  lt,
+  lte,
+  ne,
+  or,
+  inArray,
+  notInArray,
+  ilike,
+} from "drizzle-orm";
 import { CompoundCondition, FieldCondition } from "@ucast/core";
 import { defineAbility } from "@casl/ability";
 
@@ -18,6 +30,14 @@ describe("generateSQL", () => {
     const sql = generateSQL(condition, users);
 
     expect(sql).toEqual(eq(users.id, 1));
+  });
+
+  it("should generate an `ilike` filter if condition operator is `eq` and value is a regex", () => {
+    const condition = new FieldCondition("eq", "name", /admin/);
+
+    const sql = generateSQL(condition, users);
+
+    expect(sql).toEqual(ilike(users.name, "admin"));
   });
 
   it("should generate an `ne` filter if condition operator is `ne`", () => {
@@ -106,7 +126,6 @@ describe("generateSQL", () => {
     }).toThrowError("Unsupported operator: not");
   });
 
-
   it("should generate an `inArray` filter if condition operator is `in`", () => {
     const condition = new FieldCondition("in", "id", [1, 2]);
 
@@ -114,7 +133,6 @@ describe("generateSQL", () => {
 
     expect(sql).toEqual(inArray(users.id, [1, 2]));
   });
-
 
   it("should generate an `notInArray` filter if condition operator is `nin`", () => {
     const condition = new FieldCondition("nin", "id", [1, 2]);

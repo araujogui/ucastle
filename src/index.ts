@@ -2,6 +2,7 @@ import { AnyMongoAbility, ExtractSubjectType } from "@casl/ability";
 import { rulesToAST } from "@casl/ability/extra";
 import { CompoundCondition, Condition, FieldCondition } from "@ucast/core";
 import * as drizzle from "drizzle-orm";
+import { isRegExp } from "node:util/types";
 
 export type TableWithColumns<
   T extends drizzle.TableConfig = drizzle.TableConfig,
@@ -21,6 +22,10 @@ type CompoundOperator = (
 
 const eq: FieldOperator = (condition, table) => {
   const column = table[condition.field];
+
+  if (isRegExp(condition.value)) {
+    return drizzle.ilike(column, condition.value.source);
+  }
 
   return drizzle.eq(column, condition.value);
 };
@@ -93,7 +98,7 @@ const operators: Record<string, FieldOperator | CompoundOperator> = {
   and,
   or,
   in: inArray,
-  nin: notInArray
+  nin: notInArray,
 };
 
 export function generateSQL<T extends drizzle.TableConfig>(
