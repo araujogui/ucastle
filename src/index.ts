@@ -10,17 +10,17 @@ export type TableWithColumns<
   [Key in keyof T["columns"]]: T["columns"][Key];
 };
 
-type FieldOperator = (
+type FieldInterpreter = (
   condition: FieldCondition,
   table: TableWithColumns,
 ) => drizzle.SQL | undefined;
 
-type CompoundOperator = (
+type CompoundInterpreter = (
   conditions: CompoundCondition,
   table: TableWithColumns,
 ) => drizzle.SQL | undefined;
 
-const eq: FieldOperator = (condition, table) => {
+const eq: FieldInterpreter = (condition, table) => {
   const column = table[condition.field];
 
   if (isRegExp(condition.value)) {
@@ -30,49 +30,49 @@ const eq: FieldOperator = (condition, table) => {
   return drizzle.eq(column, condition.value);
 };
 
-const ne: FieldOperator = (condition, table) => {
+const ne: FieldInterpreter = (condition, table) => {
   const column = table[condition.field];
 
   return drizzle.ne(column, condition.value);
 };
 
-const gt: FieldOperator = (condition, table) => {
+const gt: FieldInterpreter = (condition, table) => {
   const column = table[condition.field];
 
   return drizzle.gt(column, condition.value);
 };
 
-const gte: FieldOperator = (condition, table) => {
+const gte: FieldInterpreter = (condition, table) => {
   const column = table[condition.field];
 
   return drizzle.gte(column, condition.value);
 };
 
-const lt: FieldOperator = (condition, table) => {
+const lt: FieldInterpreter = (condition, table) => {
   const column = table[condition.field];
 
   return drizzle.lt(column, condition.value);
 };
 
-const lte: FieldOperator = (condition, table) => {
+const lte: FieldInterpreter = (condition, table) => {
   const column = table[condition.field];
 
   return drizzle.lte(column, condition.value);
 };
 
 // we can't use `in` as const, so we're using `inArray` as alias
-// inside the `operators` object we rename it to `in` to avoid confusion
-const inArray: FieldOperator = (condition, table) => {
+// inside the `interpreters` object we rename it to `in` to avoid confusion
+const inArray: FieldInterpreter = (condition, table) => {
   const column = table[condition.field];
   return drizzle.inArray(column, condition.value as unknown[]);
 };
 
-const notInArray: FieldOperator = (condition, table) => {
+const notInArray: FieldInterpreter = (condition, table) => {
   const column = table[condition.field];
   return drizzle.notInArray(column, condition.value as unknown[]);
 };
 
-const and: CompoundOperator = (conditions, table) => {
+const and: CompoundInterpreter = (conditions, table) => {
   return drizzle.and(
     ...conditions.value.map((condition) => {
       return generateSQL(condition, table);
@@ -80,7 +80,7 @@ const and: CompoundOperator = (conditions, table) => {
   );
 };
 
-const or: CompoundOperator = (conditions, table) => {
+const or: CompoundInterpreter = (conditions, table) => {
   return drizzle.or(
     ...conditions.value.map((condition) => {
       return generateSQL(condition, table);
@@ -88,7 +88,7 @@ const or: CompoundOperator = (conditions, table) => {
   );
 };
 
-const operators: Record<string, FieldOperator | CompoundOperator> = {
+const interpreters: Record<string, FieldInterpreter | CompoundInterpreter> = {
   eq,
   ne,
   gt,
@@ -107,7 +107,7 @@ export function generateSQL<T extends drizzle.TableConfig>(
 ): drizzle.SQL | undefined {
   const { operator } = condition;
 
-  const op = operators[operator];
+  const op = interpreters[operator];
 
   if (!op) {
     throw new Error(`Unsupported operator: ${operator}`);
