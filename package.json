@@ -7,8 +7,8 @@
     "casl",
     "ucast"
   ],
-  "license": "MIT",
   "repository": "araujogui/ucastle",
+  "license": "MIT",
   "author": "Guilherme Araújo <arauujogui@gmail.com>",
   "type": "module",
   "exports": {
@@ -21,10 +21,10 @@
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
     "check-types": "tsc --noEmit",
-    "test": "vitest",
-    "test:w": "vitest --watch",
+    "format": "prettier --write .",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "test": "vitest",
+    "test:w": "vitest --watch"
   },
   "dependencies": {
     "@casl/ability": "^6.7.2",
